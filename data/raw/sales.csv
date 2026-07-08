@@ -1,0 +1,11 @@
+order_id,order_date,customer,product,category,quantity,price
+1,2026-07-01,Alice,Laptop,Electronics,1,1200
+2,2026-07-01,Bob,Mouse,Electronics,2,25
+3,2026-07-02,Charlie,Coffee,Food,5,4.5
+4,2026-07-02,Alice,Keyboard,Electronics,1,90
+5,2026-07-03,David,Notebook,Office,10,3
+6,2026-07-03,Eva,Monitor,Electronics,2,280
+7,2026-07-04,Bob,Pen,Office,15,1.5
+8,2026-07-04,Charlie,Tea,Food,8,3.2
+9,2026-07-05,Frank,Chair,Furniture,1,180
+10,2026-07-05,Alice,Desk,Furniture,1,450

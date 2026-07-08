@@ -1,0 +1,34 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Pytest
+.pytest_cache/
+
+# VS Code
+.vscode/
+
+# Airflow local runtime
+airflow.cfg
+airflow.db
+logs/
+standalone_admin_password.txt
+webserver_config.py
+
+# Generated data
+data/processed/
+data/warehouse.duckdb
+reports/
+
+# Environment files
+.env
+airflow-docker/.env
+
+# Ruff / coverage
+.ruff_cache/
+.coverage
+htmlcov/

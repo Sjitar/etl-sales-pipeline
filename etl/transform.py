@@ -1,37 +1,60 @@
+import json
+
 import pandas as pd
-from etl.logger import get_logger
+
 from etl.config import RAW_DIR, PROCESSED_DIR
-from etl.validation import validate_file_exists, validate_sales_data
+from etl.logger import get_logger
+from etl.validation import validate_file_exists
+
+
 logger = get_logger(__name__)
 
-def transform_dataframe(df):
-    """
-    Validate and transform sales data.
-    """
 
-    validate_sales_data(df)
-
+def transform_users_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     result = df.copy()
 
-    result["total"] = result["quantity"] * result["price"]
+    result = result[["id", "name", "username", "email"]]
 
     return result
 
-def transform_sales():
-    raw_file = RAW_DIR / "sales.csv"
-    processed_file = PROCESSED_DIR / "sales_clean.csv"
 
-    validate_file_exists(raw_file)
+def transform_posts_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+    result = df.copy()
 
-    df = pd.read_csv(raw_file)
+    result = result[["id", "userId", "title", "body"]]
+    result = result.rename(columns={"userId": "user_id"})
 
-    transformed_df = transform_dataframe(df)
+    return result
 
-    processed_file.parent.mkdir(parents=True, exist_ok=True)
-    transformed_df.to_csv(processed_file, index=False)
 
-    logger.info("Rows processed: %s", len(df))
-    logger.info("Saved cleaned sales data to %s", processed_file)
+def read_json_file(file_path):
+    validate_file_exists(file_path)
+
+    with open(file_path, "r", encoding="utf-8") as file:
+        return json.load(file)
+
+
+def transform_api_data():
+    users_raw = RAW_DIR / "users.json"
+    posts_raw = RAW_DIR / "posts.json"
+
+    users_processed = PROCESSED_DIR / "users.csv"
+    posts_processed = PROCESSED_DIR / "posts.csv"
+
+    users_df = pd.DataFrame(read_json_file(users_raw))
+    posts_df = pd.DataFrame(read_json_file(posts_raw))
+
+    users_df = transform_users_dataframe(users_df)
+    posts_df = transform_posts_dataframe(posts_df)
+
+    users_processed.parent.mkdir(parents=True, exist_ok=True)
+
+    users_df.to_csv(users_processed, index=False)
+    posts_df.to_csv(posts_processed, index=False)
+
+    logger.info("Saved users to %s", users_processed)
+    logger.info("Saved posts to %s", posts_processed)
+
 
 if __name__ == "__main__":
-    transform_sales()
+    transform_api_data()

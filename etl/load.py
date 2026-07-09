@@ -1,21 +1,29 @@
 import duckdb
 
-from etl.config import PROCESSED_DIR, DATABASE, SQL_DIR
+from etl.config import DATABASE, PROCESSED_DIR, SQL_DIR
 from etl.logger import get_logger
+
 
 logger = get_logger(__name__)
 
-def load_sales():
-    processed_file = PROCESSED_DIR / "sales_clean.csv"
-    sql_file = SQL_DIR / "load_sales.sql"
+
+def load_table(table_name: str):
+    csv_file = PROCESSED_DIR / f"{table_name}.csv"
+    sql_file = SQL_DIR / f"load_{table_name}.sql"
 
     query = sql_file.read_text()
 
     con = duckdb.connect(DATABASE)
-    con.execute(query, [str(processed_file)])
+    con.execute(query, [str(csv_file)])
     con.close()
 
-    logger.info("Loaded sales table into %s", DATABASE)
+    logger.info("Loaded %s table into %s", table_name, DATABASE)
+
+
+def load_api_data():
+    load_table("users")
+    load_table("posts")
+
 
 if __name__ == "__main__":
-    load_sales()
+    load_api_data()

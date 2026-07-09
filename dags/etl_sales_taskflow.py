@@ -32,6 +32,10 @@ def run_module(module_name: str) -> None:
 def etl_sales_taskflow():
 
     @task(execution_timeout=timedelta(minutes=2))
+    def extract_users():
+        run_module("etl.extract")
+    
+    @task(execution_timeout=timedelta(minutes=2))
     def transform_sales():
         run_module("etl.transform")
 
@@ -43,7 +47,7 @@ def etl_sales_taskflow():
     def build_report():
         run_module("etl.transform")
 
-    transform_sales() >> load_to_duckdb() >> build_report()
+    extract_users() >> transform_sales() >> load_to_duckdb() >> build_report()
 
 
 etl_sales_taskflow()

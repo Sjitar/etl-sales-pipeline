@@ -13,6 +13,9 @@ airflow-stop:
 airflow-dags:
 	conda run -n $(AIRFLOW_ENV) env AIRFLOW_HOME=$(AIRFLOW_HOME) airflow dags list
 
+etl-extract:
+	cd $(PROJECT_DIR) && $(ANALYTICS_PYTHON) -m etl.extract
+
 etl-transform:
 	cd $(PROJECT_DIR) && $(ANALYTICS_PYTHON) -m etl.transform
 
@@ -22,7 +25,7 @@ etl-load:
 etl-report:
 	cd $(PROJECT_DIR) && $(ANALYTICS_PYTHON) -m etl.report
 
-etl: etl-transform etl-load etl-report
+etl: etl-extract etl-transform etl-load etl-report
 
 clean:
 	rm -f data/processed/*.csv

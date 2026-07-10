@@ -3,13 +3,10 @@ from pathlib import Path
 
 import requests
 
-from etl.config import RAW_DIR
+from etl.config import API_BASE_URL, API_RESOURCES, RAW_DIR
 from etl.logger import get_logger
 
-
 logger = get_logger(__name__)
-
-from etl.config import API_BASE_URL, API_RESOURCES, RAW_DIR
 
 
 def extract_resource(resource: str) -> Path:

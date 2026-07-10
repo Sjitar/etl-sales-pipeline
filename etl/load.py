@@ -3,7 +3,6 @@ import duckdb
 from etl.config import DATABASE, PROCESSED_DIR, SQL_DIR
 from etl.logger import get_logger
 
-
 logger = get_logger(__name__)
 
 

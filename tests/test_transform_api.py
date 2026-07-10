@@ -4,14 +4,16 @@ from etl.transform import transform_posts_dataframe, transform_users_dataframe
 
 
 def test_transform_users_dataframe_keeps_expected_columns():
-    df = pd.DataFrame({
-        "id": [1],
-        "name": ["Leanne Graham"],
-        "username": ["Bret"],
-        "email": ["test@example.com"],
-        "phone": ["123"],
-        "website": ["example.com"],
-    })
+    df = pd.DataFrame(
+        {
+            "id": [1],
+            "name": ["Leanne Graham"],
+            "username": ["Bret"],
+            "email": ["test@example.com"],
+            "phone": ["123"],
+            "website": ["example.com"],
+        }
+    )
 
     result = transform_users_dataframe(df)
 
@@ -19,12 +21,14 @@ def test_transform_users_dataframe_keeps_expected_columns():
 
 
 def test_transform_posts_dataframe_renames_user_id_column():
-    df = pd.DataFrame({
-        "id": [1],
-        "userId": [10],
-        "title": ["Post title"],
-        "body": ["Post body"],
-    })
+    df = pd.DataFrame(
+        {
+            "id": [1],
+            "userId": [10],
+            "title": ["Post title"],
+            "body": ["Post body"],
+        }
+    )
 
     result = transform_posts_dataframe(df)
 

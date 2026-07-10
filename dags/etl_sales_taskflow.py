@@ -1,11 +1,11 @@
-from datetime import datetime, timedelta
 import subprocess
+from datetime import datetime, timedelta
 
 from airflow.decorators import dag, task
 
-
 PROJECT_DIR = "/Users/sergeji/Projects/airflow-airbyte-lab"
 PYTHON = "/Users/sergeji/miniforge3/envs/analytics/bin/python"
+
 
 def run_module(module_name: str) -> None:
     result = subprocess.run(
@@ -34,7 +34,7 @@ def etl_sales_taskflow():
     @task(execution_timeout=timedelta(minutes=2))
     def extract_users():
         run_module("etl.extract")
-    
+
     @task(execution_timeout=timedelta(minutes=2))
     def transform_sales():
         run_module("etl.transform")

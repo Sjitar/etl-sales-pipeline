@@ -2,10 +2,9 @@ import json
 
 import pandas as pd
 
-from etl.config import RAW_DIR, PROCESSED_DIR
+from etl.config import PROCESSED_DIR, RAW_DIR
 from etl.logger import get_logger
 from etl.validation import validate_file_exists
-
 
 logger = get_logger(__name__)
 
@@ -30,7 +29,7 @@ def transform_posts_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 def read_json_file(file_path):
     validate_file_exists(file_path)
 
-    with open(file_path, "r", encoding="utf-8") as file:
+    with open(file_path, encoding="utf-8") as file:
         return json.load(file)
 
 

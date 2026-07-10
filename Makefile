@@ -32,3 +32,18 @@ clean:
 	rm -f reports/*.csv
 	rm -f data/warehouse.duckdb
 	@echo "Cleaned generated files."
+
+lint:
+	ruff check .
+
+format:
+	ruff check . --fix
+	ruff format .
+
+format-check:
+	ruff format --check .
+
+test:
+	pytest
+
+check: lint format-check test

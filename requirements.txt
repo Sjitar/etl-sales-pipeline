@@ -1,6 +1,0 @@
-pandas
-duckdb
-requests
-pytest
-python-dotenv
-ruff

@@ -1,3 +1,41 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "airflow-rest-api-etl"
+version = "0.1.0"
+description = "Educational REST API ETL pipeline built with Airflow, DuckDB, Pandas and Pytest."
+readme = "README.md"
+requires-python = ">=3.13"
+license = { text = "MIT" }
+
+dependencies = [
+    "duckdb",
+    "pandas",
+    "python-dotenv",
+    "requests",
+]
+
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "ruff",
+]
+
+
+[tool.setuptools.packages.find]
+include = ["etl*"]
+
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "-ra"
+
+
 [tool.ruff]
 target-version = "py313"
 line-length = 88
@@ -9,6 +47,7 @@ exclude = [
     "logs",
 ]
 
+
 [tool.ruff.lint]
 select = [
     "E",
@@ -17,6 +56,7 @@ select = [
     "B",
     "UP",
 ]
+
 
 [tool.ruff.format]
 quote-style = "double"

@@ -1,0 +1,8 @@
+duckdb
+pandas
+python-dotenv
+requests
+
+[dev]
+pytest
+ruff

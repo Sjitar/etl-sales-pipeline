@@ -44,6 +44,10 @@ def api_etl_taskflow():
         run_module("etl.load_postgres")
 
     @task(execution_timeout=timedelta(minutes=2))
+    def validate_postgres_data():
+        run_module("etl.quality")
+
+    @task(execution_timeout=timedelta(minutes=2))
     def load_to_duckdb():
         run_module("etl.transform")
 
@@ -54,10 +58,11 @@ def api_etl_taskflow():
     extract = extract_api_data()
     transform = transform_api_data()
     postgres = load_to_postgres()
+    quality = validate_postgres_data()
     duckdb = load_to_duckdb()
     report = build_report()
 
-    extract >> transform >> postgres >> duckdb >> report
+    extract >> transform >> postgres >> quality >> duckdb >> report
 
 
 api_etl_taskflow()

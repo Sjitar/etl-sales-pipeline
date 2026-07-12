@@ -21,6 +21,9 @@ etl-extract:
 etl-transform:
 	cd $(PROJECT_DIR) && $(ANALYTICS_PYTHON) -m etl.transform
 
+etl-quality:
+	cd $(PROJECT_DIR) && $(ANALYTICS_PYTHON) -m etl.quality
+
 etl-load:
 	cd $(PROJECT_DIR) && $(ANALYTICS_PYTHON) -m etl.load
 
@@ -30,7 +33,7 @@ etl-report:
 etl-load-postgres:
 	cd $(PROJECT_DIR) && $(ANALYTICS_PYTHON) -m etl.load_postgres
 
-etl: etl-extract etl-transform etl-load-postgres etl-load etl-report
+etl: etl-extract etl-transform etl-load-postgres etl-quality etl-load etl-report
 
 clean:
 	rm -f data/processed/*.csv

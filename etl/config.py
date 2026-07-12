@@ -26,3 +26,9 @@ DATABASE_NAME = os.getenv("DATABASE_NAME", "warehouse.duckdb")
 DATABASE = BASE_DIR / "data" / DATABASE_NAME
 
 REPORT_FILE = os.getenv("REPORT_FILE", "posts_by_user.csv")
+
+POSTGRES_HOST = os.getenv("POSTGRES_HOST", "localhost")
+POSTGRES_PORT = int(os.getenv("POSTGRES_PORT", "5432"))
+POSTGRES_DB = os.getenv("POSTGRES_DB", "etl")
+POSTGRES_USER = os.getenv("POSTGRES_USER", "etl")
+POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "etl")

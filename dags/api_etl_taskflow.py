@@ -23,21 +23,25 @@ def run_module(module_name: str) -> None:
 
 
 @dag(
-    dag_id="etl_sales_taskflow",
+    dag_id="api_etl_taskflow",
     start_date=datetime(2026, 7, 6),
     schedule=None,
     catchup=False,
     tags=["etl", "duckdb", "taskflow", "learning"],
 )
-def etl_sales_taskflow():
+def api_etl_taskflow():
 
     @task(execution_timeout=timedelta(minutes=2))
-    def extract_users():
+    def extract_api_data():
         run_module("etl.extract")
 
     @task(execution_timeout=timedelta(minutes=2))
-    def transform_sales():
+    def transform_api_data():
         run_module("etl.transform")
+
+    @task(execution_timeout=timedelta(minutes=2))
+    def load_to_postgres():
+        run_module("etl.load_postgres")
 
     @task(execution_timeout=timedelta(minutes=2))
     def load_to_duckdb():
@@ -47,7 +51,13 @@ def etl_sales_taskflow():
     def build_report():
         run_module("etl.transform")
 
-    extract_users() >> transform_sales() >> load_to_duckdb() >> build_report()
+    extract = extract_api_data()
+    transform = transform_api_data()
+    postgres = load_to_postgres()
+    duckdb = load_to_duckdb()
+    report = build_report()
+
+    extract >> transform >> postgres >> duckdb >> report
 
 
-etl_sales_taskflow()
+api_etl_taskflow()

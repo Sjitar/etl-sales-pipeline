@@ -2,6 +2,7 @@ duckdb
 pandas
 python-dotenv
 requests
+psycopg[binary]
 
 [dev]
 pytest

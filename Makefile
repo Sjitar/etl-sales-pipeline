@@ -4,7 +4,9 @@ AIRFLOW_ENV := airflow-lab
 ANALYTICS_PYTHON := $(HOME)/miniforge3/envs/analytics/bin/python
 
 airflow-start:
-	conda run -n $(AIRFLOW_ENV) env AIRFLOW_HOME=$(AIRFLOW_HOME) airflow standalone
+	conda run --no-capture-output -n $(AIRFLOW_ENV) \
+		env AIRFLOW_HOME=$(AIRFLOW_HOME) \
+		airflow standalone
 
 airflow-stop:
 	pkill -f airflow || true
@@ -25,7 +27,10 @@ etl-load:
 etl-report:
 	cd $(PROJECT_DIR) && $(ANALYTICS_PYTHON) -m etl.report
 
-etl: etl-extract etl-transform etl-load etl-report
+etl-load-postgres:
+	cd $(PROJECT_DIR) && $(ANALYTICS_PYTHON) -m etl.load_postgres
+
+etl: etl-extract etl-transform etl-load-postgres etl-load etl-report
 
 clean:
 	rm -f data/processed/*.csv

@@ -9,6 +9,7 @@ Requires-Dist: duckdb
 Requires-Dist: pandas
 Requires-Dist: python-dotenv
 Requires-Dist: requests
+Requires-Dist: psycopg[binary]
 Provides-Extra: dev
 Requires-Dist: pytest; extra == "dev"
 Requires-Dist: ruff; extra == "dev"

@@ -5,7 +5,22 @@ from airflow.decorators import dag, task
 
 PROJECT_DIR = "/Users/sergeji/Projects/airflow-airbyte-lab"
 PYTHON = "/Users/sergeji/miniforge3/envs/analytics/bin/python"
+DBT = "/Users/sergeji/miniforge3/envs/dbt-lab/bin/dbt"
+DBT_DIR = "/Users/sergeji/Projects/airflow-airbyte-lab/dbt/analytics"
 
+def run_dbt_build() -> None:
+    result = subprocess.run(
+        [DBT, "build"],
+        cwd=DBT_DIR,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+
+    print(result.stdout)
+
+    if result.stderr:
+        print(result.stderr)
 
 def run_module(module_name: str) -> None:
     result = subprocess.run(
@@ -51,18 +66,18 @@ def api_etl_taskflow():
     def load_to_duckdb():
         run_module("etl.transform")
 
-    @task(execution_timeout=timedelta(minutes=2))
-    def build_report():
-        run_module("etl.transform")
+    @task(execution_timeout=timedelta(minutes=5))
+    def build_dbt_models():
+        run_dbt_build()
 
     extract = extract_api_data()
     transform = transform_api_data()
     postgres = load_to_postgres()
     quality = validate_postgres_data()
     duckdb = load_to_duckdb()
-    report = build_report()
+    dbt = build_dbt_models()
 
-    extract >> transform >> postgres >> quality >> duckdb >> report
+    extract >> transform >> postgres >> quality >> duckdb >> dbt
 
 
 api_etl_taskflow()

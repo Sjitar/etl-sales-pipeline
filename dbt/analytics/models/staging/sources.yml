@@ -1,0 +1,27 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: main
+    tables:
+      - name: users
+        columns:
+          - name: id
+            data_tests:
+              - not_null
+              - unique
+
+      - name: posts
+        columns:
+          - name: id
+            data_tests:
+              - not_null
+              - unique
+
+          - name: user_id
+            data_tests:
+              - not_null
+              - relationships:
+                  arguments:
+                    to: source('raw', 'users')
+                    field: id

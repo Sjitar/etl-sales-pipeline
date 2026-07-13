@@ -32,3 +32,8 @@ airflow-docker/.env
 .ruff_cache/
 .coverage
 htmlcov/
+
+# dbt generated artifacts
+dbt/**/target/
+dbt/**/logs/
+dbt/**/dbt_packages/

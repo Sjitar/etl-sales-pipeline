@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: posts_by_user
+    description: User-level analytics aggregated from posts.
+    columns:
+      - name: user_id
+        data_tests:
+          - not_null
+          - unique
+
+      - name: posts_count
+        data_tests:
+          - not_null

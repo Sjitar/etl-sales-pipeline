@@ -8,6 +8,7 @@ PYTHON = "/Users/sergeji/miniforge3/envs/analytics/bin/python"
 DBT = "/Users/sergeji/miniforge3/envs/dbt-lab/bin/dbt"
 DBT_DIR = "/Users/sergeji/Projects/airflow-airbyte-lab/dbt/analytics"
 
+
 def run_dbt_build() -> None:
     result = subprocess.run(
         [DBT, "build"],
@@ -21,6 +22,7 @@ def run_dbt_build() -> None:
 
     if result.stderr:
         print(result.stderr)
+
 
 def run_module(module_name: str) -> None:
     result = subprocess.run(

@@ -1,83 +1,190 @@
+.PHONY: \
+	help \
+	airflow-start airflow-stop airflow-dags \
+	docker-up docker-down docker-ps \
+	etl-extract etl-transform etl-load-postgres etl-quality etl-load etl \
+	dbt-debug dbt-run dbt-test dbt-build dbt-clean \
+	dbt-docs-generate dbt-docs-serve \
+	lint format format-check test check \
+	clean
+
 PROJECT_DIR := $(HOME)/Projects/airflow-airbyte-lab
 AIRFLOW_HOME := $(PROJECT_DIR)
+DBT_DIR := $(PROJECT_DIR)/dbt/analytics
+
+ANALYTICS_ENV := analytics
 AIRFLOW_ENV := airflow-lab
-ANALYTICS_PYTHON := $(HOME)/miniforge3/envs/analytics/bin/python
-DBT_ENV = dbt-lab
-DBT_DIR = $(PROJECT_DIR)/dbt/analytics
+DBT_ENV := dbt-lab
+
+CONDA_RUN := conda run --no-capture-output
+
+.DEFAULT_GOAL := help
+
+
+# ----------------------------
+# Help
+# ----------------------------
+
+help:
+	@echo "Available commands:"
+	@echo ""
+	@echo "  make airflow-start       Start Airflow"
+	@echo "  make airflow-stop        Stop Airflow"
+	@echo "  make airflow-dags        List Airflow DAGs"
+	@echo ""
+	@echo "  make docker-up           Start PostgreSQL and Adminer"
+	@echo "  make docker-down         Stop PostgreSQL and Adminer"
+	@echo "  make docker-ps           Show Docker Compose services"
+	@echo ""
+	@echo "  make etl                 Run the full ETL pipeline"
+	@echo "  make etl-extract         Extract data from REST API"
+	@echo "  make etl-transform       Transform API data"
+	@echo "  make etl-load-postgres   Load data into PostgreSQL"
+	@echo "  make etl-quality         Run PostgreSQL data checks"
+	@echo "  make etl-load            Load PostgreSQL data into DuckDB"
+	@echo ""
+	@echo "  make dbt-debug           Check dbt configuration"
+	@echo "  make dbt-run             Run dbt models"
+	@echo "  make dbt-test            Run dbt tests"
+	@echo "  make dbt-build           Run dbt models and tests"
+	@echo "  make dbt-clean           Remove dbt generated artifacts"
+	@echo "  make dbt-docs-generate   Generate dbt documentation"
+	@echo "  make dbt-docs-serve      Serve dbt docs on port 8082"
+	@echo ""
+	@echo "  make lint                Run Ruff linter"
+	@echo "  make format              Fix and format Python code"
+	@echo "  make format-check        Check Python formatting"
+	@echo "  make test                Run pytest"
+	@echo "  make check               Run lint, format check and tests"
+	@echo ""
+	@echo "  make clean               Remove generated local data"
+
+
+# ----------------------------
+# Airflow
+# ----------------------------
 
 airflow-start:
-	conda run --no-capture-output -n $(AIRFLOW_ENV) \
+	$(CONDA_RUN) -n $(AIRFLOW_ENV) \
 		env AIRFLOW_HOME=$(AIRFLOW_HOME) \
 		airflow standalone
 
 airflow-stop:
-	pkill -f airflow || true
+	@pkill -f airflow || true
 	@echo "Airflow stopped."
 
 airflow-dags:
-	conda run -n $(AIRFLOW_ENV) env AIRFLOW_HOME=$(AIRFLOW_HOME) airflow dags list
+	$(CONDA_RUN) -n $(AIRFLOW_ENV) \
+		env AIRFLOW_HOME=$(AIRFLOW_HOME) \
+		airflow dags list
+
+
+# ----------------------------
+# Docker
+# ----------------------------
+
+docker-up:
+	cd $(PROJECT_DIR) && docker compose up -d
+
+docker-down:
+	cd $(PROJECT_DIR) && docker compose down
+
+docker-ps:
+	cd $(PROJECT_DIR) && docker compose ps
+
+
+# ----------------------------
+# ETL
+# ----------------------------
 
 etl-extract:
-	cd $(PROJECT_DIR) && $(ANALYTICS_PYTHON) -m etl.extract
+	cd $(PROJECT_DIR) && \
+		$(CONDA_RUN) -n $(ANALYTICS_ENV) python -m etl.extract
 
 etl-transform:
-	cd $(PROJECT_DIR) && $(ANALYTICS_PYTHON) -m etl.transform
-
-etl-quality:
-	cd $(PROJECT_DIR) && $(ANALYTICS_PYTHON) -m etl.quality
-
-etl-load:
-	cd $(PROJECT_DIR) && $(ANALYTICS_PYTHON) -m etl.load
+	cd $(PROJECT_DIR) && \
+		$(CONDA_RUN) -n $(ANALYTICS_ENV) python -m etl.transform
 
 etl-load-postgres:
-	cd $(PROJECT_DIR) && $(ANALYTICS_PYTHON) -m etl.load_postgres
+	cd $(PROJECT_DIR) && \
+		$(CONDA_RUN) -n $(ANALYTICS_ENV) python -m etl.load_postgres
+
+etl-quality:
+	cd $(PROJECT_DIR) && \
+		$(CONDA_RUN) -n $(ANALYTICS_ENV) python -m etl.quality
+
+etl-load:
+	cd $(PROJECT_DIR) && \
+		$(CONDA_RUN) -n $(ANALYTICS_ENV) python -m etl.load
 
 etl: etl-extract etl-transform etl-load-postgres etl-quality etl-load dbt-build
 
-clean:
-	rm -f data/processed/*.csv
-	rm -f data/warehouse.duckdb
-	@echo "Cleaned generated files."
+
+# ----------------------------
+# dbt
+# ----------------------------
+
+dbt-debug:
+	cd $(DBT_DIR) && \
+		$(CONDA_RUN) -n $(DBT_ENV) dbt debug
+
+dbt-run:
+	cd $(DBT_DIR) && \
+		$(CONDA_RUN) -n $(DBT_ENV) dbt run
+
+dbt-test:
+	cd $(DBT_DIR) && \
+		$(CONDA_RUN) -n $(DBT_ENV) dbt test
+
+dbt-build:
+	cd $(DBT_DIR) && \
+		$(CONDA_RUN) -n $(DBT_ENV) dbt build
+
+dbt-clean:
+	cd $(DBT_DIR) && \
+		$(CONDA_RUN) -n $(DBT_ENV) dbt clean
+
+dbt-docs-generate:
+	cd $(DBT_DIR) && \
+		$(CONDA_RUN) -n $(DBT_ENV) dbt docs generate
+
+dbt-docs-serve:
+	cd $(DBT_DIR) && \
+		$(CONDA_RUN) -n $(DBT_ENV) dbt docs serve --port 8082
+
+
+# ----------------------------
+# Code quality
+# ----------------------------
 
 lint:
-	ruff check .
+	cd $(PROJECT_DIR) && \
+		$(CONDA_RUN) -n $(ANALYTICS_ENV) ruff check .
 
 format:
-	ruff check . --fix
-	ruff format .
+	cd $(PROJECT_DIR) && \
+		$(CONDA_RUN) -n $(ANALYTICS_ENV) ruff check . --fix
+	cd $(PROJECT_DIR) && \
+		$(CONDA_RUN) -n $(ANALYTICS_ENV) ruff format .
 
 format-check:
-	ruff format --check .
+	cd $(PROJECT_DIR) && \
+		$(CONDA_RUN) -n $(ANALYTICS_ENV) ruff format --check .
 
 test:
-	pytest
+	cd $(PROJECT_DIR) && \
+		$(CONDA_RUN) -n $(ANALYTICS_ENV) pytest
 
 check: lint format-check test
 
-dbt-debug:
-	conda run --no-capture-output -n $(DBT_ENV) \
-		sh -c "cd $(DBT_DIR) && dbt debug"
 
-dbt-run:
-	conda run --no-capture-output -n $(DBT_ENV) \
-		sh -c "cd $(DBT_DIR) && dbt run"
+# ----------------------------
+# Cleanup
+# ----------------------------
 
-dbt-test:
-	conda run --no-capture-output -n $(DBT_ENV) \
-		sh -c "cd $(DBT_DIR) && dbt test"
-
-dbt-build:
-	conda run --no-capture-output -n $(DBT_ENV) \
-		sh -c "cd $(DBT_DIR) && dbt build"
-
-dbt-clean:
-	conda run --no-capture-output -n $(DBT_ENV) \
-		sh -c "cd $(DBT_DIR) && dbt clean"
-
-dbt-docs-generate:
-	conda run --no-capture-output -n $(DBT_ENV) \
-		sh -c "cd $(DBT_DIR) && dbt docs generate"
-
-dbt-docs-serve:
-	conda run --no-capture-output -n $(DBT_ENV) \
-		sh -c "cd $(DBT_DIR) && dbt docs serve --port 8082"
+clean:
+	rm -rf $(PROJECT_DIR)/data/processed/*
+	rm -f $(PROJECT_DIR)/data/warehouse.duckdb
+	rm -rf $(DBT_DIR)/target
+	rm -rf $(DBT_DIR)/logs
+	@echo "Generated files removed."

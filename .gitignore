@@ -37,3 +37,12 @@ htmlcov/
 dbt/**/target/
 dbt/**/logs/
 dbt/**/dbt_packages/
+
+# uv
+.venv/
+
+# Python packaging
+*.egg-info/
+
+# Python caches
+.mypy_cache/

@@ -3,13 +3,12 @@
 ![Python](https://img.shields.io/badge/Python-3.13-blue)
 ![Apache Airflow](https://img.shields.io/badge/Apache%20Airflow-2.10.5-orange)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-blue)
-![DuckDB](https://img.shields.io/badge/DuckDB-Analytics-yellow)
 ![dbt](https://img.shields.io/badge/dbt-Core-orange)
 ![Pytest](https://img.shields.io/badge/tests-pytest-green)
 ![Ruff](https://img.shields.io/badge/code%20quality-Ruff-purple)
 ![CI](https://github.com/Sjitar/etl-sales-pipeline/actions/workflows/tests.yml/badge.svg)
 
-Учебный Data Engineering-проект, демонстрирующий полный ETL-пайплайн: получение данных из REST API, преобразование, загрузку в PostgreSQL, проверки качества, создание аналитического слоя в DuckDB и трансформации с помощью dbt.
+Учебный Data Engineering-проект, демонстрирующий полный ETL-пайплайн: получение данных из REST API, преобразование, загрузку в PostgreSQL, проверки качества и трансформации с помощью dbt.
 
 Оркестрация выполняется Apache Airflow, а качество кода автоматически проверяется через GitHub Actions.
 
@@ -22,7 +21,6 @@ flowchart TD
     TRANSFORM[Python Transform]
     POSTGRES[(PostgreSQL)]
     QUALITY[Data Quality Checks]
-    DUCKDB[(DuckDB)]
     DBT[dbt Models and Tests]
     MART[Analytics Mart]
     AIRFLOW[Apache Airflow]
@@ -31,15 +29,13 @@ flowchart TD
     EXTRACT --> TRANSFORM
     TRANSFORM --> POSTGRES
     POSTGRES --> QUALITY
-    QUALITY --> DUCKDB
-    DUCKDB --> DBT
+    QUALITY --> DBT
     DBT --> MART
 
     AIRFLOW -. orchestrates .-> EXTRACT
     AIRFLOW -. orchestrates .-> TRANSFORM
     AIRFLOW -. orchestrates .-> POSTGRES
     AIRFLOW -. orchestrates .-> QUALITY
-    AIRFLOW -. orchestrates .-> DUCKDB
     AIRFLOW -. orchestrates .-> DBT
 ```
 
@@ -53,7 +49,7 @@ flowchart TD
    - таблицы не пустые;
    - обязательные поля не содержат `NULL`;
    - все посты связаны с существующими пользователями.
-6. Данные копируются из PostgreSQL в DuckDB.
+6. dbt строит аналитические модели поверх данных в PostgreSQL.
 7. dbt создаёт staging-модели и аналитическую витрину `posts_by_user`.
 8. Airflow управляет всей последовательностью задач.
 
@@ -62,7 +58,6 @@ flowchart TD
 - Python
 - Apache Airflow
 - PostgreSQL
-- DuckDB
 - dbt Core
 - Pandas
 - Psycopg
@@ -167,7 +162,6 @@ POSTGRES_DB=etl
 POSTGRES_USER=etl
 POSTGRES_PASSWORD=etl
 
-DATABASE_NAME=warehouse.duckdb
 ```
 
 Файл `.env` не должен попадать в Git.
@@ -213,7 +207,6 @@ extract
 → transform
 → PostgreSQL load
 → quality checks
-→ DuckDB load
 → dbt build
 ```
 
@@ -308,7 +301,7 @@ Pytest
 
 - трансформации пользователей;
 - трансформации постов;
-- загрузки DataFrame в DuckDB;
+- загрузки данных в PostgreSQL;
 - вспомогательных функций качества данных;
 - проверки структуры и логики ETL.
 

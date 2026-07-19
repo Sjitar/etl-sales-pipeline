@@ -37,7 +37,6 @@ help:
 	@echo "  make etl-transform       Transform API data"
 	@echo "  make etl-load-postgres   Load data into PostgreSQL"
 	@echo "  make etl-quality         Run PostgreSQL data checks"
-	@echo "  make etl-load            Load PostgreSQL data into DuckDB"
 	@echo ""
 	@echo "  make dbt-debug           Check dbt configuration"
 	@echo "  make dbt-run             Run dbt models"
@@ -178,7 +177,6 @@ check: lint format-check test
 
 clean:
 	rm -rf $(PROJECT_DIR)/data/processed/*
-	rm -f $(PROJECT_DIR)/data/warehouse.duckdb
 	rm -rf $(DBT_DIR)/target
 	rm -rf $(DBT_DIR)/logs
 	@echo "Generated files removed."

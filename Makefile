@@ -8,15 +8,11 @@
 	lint format format-check test check \
 	clean
 
-PROJECT_DIR := $(HOME)/Projects/airflow-airbyte-lab
+PROJECT_DIR := $(CURDIR)
 AIRFLOW_HOME := $(PROJECT_DIR)
 DBT_DIR := $(PROJECT_DIR)/dbt/analytics
 
-ANALYTICS_ENV := analytics
-AIRFLOW_ENV := airflow-lab
-DBT_ENV := dbt-lab
-
-CONDA_RUN := conda run --no-capture-output
+UV_RUN := uv run
 
 .DEFAULT_GOAL := help
 
@@ -41,7 +37,6 @@ help:
 	@echo "  make etl-transform       Transform API data"
 	@echo "  make etl-load-postgres   Load data into PostgreSQL"
 	@echo "  make etl-quality         Run PostgreSQL data checks"
-	@echo "  make etl-load            Load PostgreSQL data into DuckDB"
 	@echo ""
 	@echo "  make dbt-debug           Check dbt configuration"
 	@echo "  make dbt-run             Run dbt models"
@@ -65,18 +60,16 @@ help:
 # ----------------------------
 
 airflow-start:
-	$(CONDA_RUN) -n $(AIRFLOW_ENV) \
-		env AIRFLOW_HOME=$(AIRFLOW_HOME) \
-		airflow standalone
+	cd $(PROJECT_DIR) && \
+		AIRFLOW_HOME=$(AIRFLOW_HOME) $(UV_RUN) airflow standalone
 
 airflow-stop:
 	@pkill -f airflow || true
 	@echo "Airflow stopped."
 
 airflow-dags:
-	$(CONDA_RUN) -n $(AIRFLOW_ENV) \
-		env AIRFLOW_HOME=$(AIRFLOW_HOME) \
-		airflow dags list
+	cd $(PROJECT_DIR) && \
+		AIRFLOW_HOME=$(AIRFLOW_HOME) $(UV_RUN) airflow dags list
 
 
 # ----------------------------
@@ -99,23 +92,23 @@ docker-ps:
 
 etl-extract:
 	cd $(PROJECT_DIR) && \
-		$(CONDA_RUN) -n $(ANALYTICS_ENV) python -m etl.extract
+		$(UV_RUN) python -m etl.extract
 
 etl-transform:
 	cd $(PROJECT_DIR) && \
-		$(CONDA_RUN) -n $(ANALYTICS_ENV) python -m etl.transform
+		$(UV_RUN) python -m etl.transform
 
 etl-load-postgres:
 	cd $(PROJECT_DIR) && \
-		$(CONDA_RUN) -n $(ANALYTICS_ENV) python -m etl.load_postgres
+		$(UV_RUN) python -m etl.load_postgres
 
 etl-quality:
 	cd $(PROJECT_DIR) && \
-		$(CONDA_RUN) -n $(ANALYTICS_ENV) python -m etl.quality
+		$(UV_RUN) python -m etl.quality
 
 etl-load:
 	cd $(PROJECT_DIR) && \
-		$(CONDA_RUN) -n $(ANALYTICS_ENV) python -m etl.load
+		$(UV_RUN) python -m etl.load
 
 etl: etl-extract etl-transform etl-load-postgres etl-quality etl-load dbt-build
 
@@ -159,21 +152,21 @@ dbt-docs-serve:
 
 lint:
 	cd $(PROJECT_DIR) && \
-		$(CONDA_RUN) -n $(ANALYTICS_ENV) ruff check .
+		$(UV_RUN) ruff check .
 
 format:
 	cd $(PROJECT_DIR) && \
-		$(CONDA_RUN) -n $(ANALYTICS_ENV) ruff check . --fix
+		$(UV_RUN) ruff check . --fix
 	cd $(PROJECT_DIR) && \
-		$(CONDA_RUN) -n $(ANALYTICS_ENV) ruff format .
+		$(UV_RUN) ruff format .
 
 format-check:
 	cd $(PROJECT_DIR) && \
-		$(CONDA_RUN) -n $(ANALYTICS_ENV) ruff format --check .
+		$(UV_RUN) ruff format --check .
 
 test:
 	cd $(PROJECT_DIR) && \
-		$(CONDA_RUN) -n $(ANALYTICS_ENV) pytest
+		$(UV_RUN) pytest
 
 check: lint format-check test
 
@@ -184,7 +177,6 @@ check: lint format-check test
 
 clean:
 	rm -rf $(PROJECT_DIR)/data/processed/*
-	rm -f $(PROJECT_DIR)/data/warehouse.duckdb
 	rm -rf $(DBT_DIR)/target
 	rm -rf $(DBT_DIR)/logs
 	@echo "Generated files removed."

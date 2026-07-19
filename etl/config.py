@@ -22,9 +22,6 @@ API_RESOURCES = os.getenv(
     "users,posts",
 ).split(",")
 
-DATABASE_NAME = os.getenv("DATABASE_NAME", "warehouse.duckdb")
-DATABASE = BASE_DIR / "data" / DATABASE_NAME
-
 REPORT_FILE = os.getenv("REPORT_FILE", "posts_by_user.csv")
 
 POSTGRES_HOST = os.getenv("POSTGRES_HOST", "localhost")

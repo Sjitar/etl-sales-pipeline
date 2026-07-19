@@ -44,7 +44,7 @@ def run_module(module_name: str) -> None:
     start_date=datetime(2026, 7, 6),
     schedule=None,
     catchup=False,
-    tags=["etl", "duckdb", "taskflow", "learning"],
+    tags=["etl", "taskflow", "learning"],
 )
 def api_etl_taskflow():
 
@@ -64,10 +64,6 @@ def api_etl_taskflow():
     def validate_postgres_data():
         run_module("etl.quality")
 
-    @task(execution_timeout=timedelta(minutes=2))
-    def load_to_duckdb():
-        run_module("etl.transform")
-
     @task(execution_timeout=timedelta(minutes=5))
     def build_dbt_models():
         run_dbt_build()
@@ -76,10 +72,9 @@ def api_etl_taskflow():
     transform = transform_api_data()
     postgres = load_to_postgres()
     quality = validate_postgres_data()
-    duckdb = load_to_duckdb()
     dbt = build_dbt_models()
 
-    extract >> transform >> postgres >> quality >> duckdb >> dbt
+    extract >> transform >> postgres >> quality >> dbt
 
 
 api_etl_taskflow()

@@ -1,7 +1,6 @@
 services:
   postgres:
     image: postgres:17
-
     container_name: etl-postgres
 
     environment:
@@ -16,14 +15,13 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U etl"]
+      test: ["CMD-SHELL", "pg_isready -U etl -d etl"]
       interval: 10s
       timeout: 5s
       retries: 5
 
   adminer:
     image: adminer
-
     container_name: etl-adminer
 
     depends_on:
@@ -32,6 +30,24 @@ services:
 
     ports:
       - "8081:8080"
+
+  etl:
+    build:
+      context: .
+      dockerfile: docker/etl/Dockerfile
+
+    container_name: etl-pipeline
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: etl
+      POSTGRES_USER: etl
+      POSTGRES_PASSWORD: etl
 
 volumes:
   postgres_data:

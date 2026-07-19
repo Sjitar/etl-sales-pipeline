@@ -73,47 +73,24 @@ flowchart TD
 - Make
 
 ## Project Structure
-
-```text
-airflow-airbyte-lab/
-├── .github/
-│   └── workflows/
-│       └── tests.yml
-│
-├── dags/
-│   ├── api_etl_taskflow.py
-│   └── hello_airflow.py
-│
+'''
+├── airflow/
+│   ├── dags/
+│   │   ├── api_etl_taskflow.py
+│   │   └── hello_airflow.py
+│   ├── logs/
+│   └── plugins/
 ├── dbt/
 │   └── analytics/
-│       ├── models/
-│       │   ├── staging/
-│       │   └── marts/
-│       └── dbt_project.yml
-│
+├── docker/
+│   ├── airflow/
+│   ├── etl/
+│   └── postgres/
+│       └── init/
 ├── etl/
-│   ├── config.py
-│   ├── extract.py
-│   ├── load.py
-│   ├── load_postgres.py
-│   ├── logger.py
-│   ├── postgres.py
-│   ├── quality.py
-│   ├── transform.py
-│   └── validation.py
-│
 ├── sql/
-│   └── create_postgres_tables.sql
-│
-├── tests/
-├── data/
-├── docker-compose.yml
-├── Makefile
-├── pyproject.toml
-├── .env.example
-└── README.md
-```
-
+└── tests/
+'''
 ## Data Model
 
 ### Raw tables

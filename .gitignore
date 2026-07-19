@@ -19,6 +19,10 @@ logs/
 standalone_admin_password.txt
 webserver_config.py
 
+# Airflow runtime files
+airflow/logs/*
+!airflow/logs/.gitkeep
+
 # Generated data
 data/processed/
 data/warehouse.duckdb

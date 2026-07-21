@@ -21,13 +21,23 @@ def extract_resource(resource: str) -> Path:
     output_file.parent.mkdir(parents=True, exist_ok=True)
     output_file.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
-    logger.info("Extracted %s records from %s to %s", len(data), url, output_file)
+    logger.info(
+        "Extracted %s records from %s to %s",
+        len(data),
+        url,
+        output_file,
+    )
+
     return output_file
 
 
-def extract_api_data():
+def extract_api_data() -> list[Path]:
+    extracted_files = []
+
     for resource in API_RESOURCES:
-        extract_resource(resource)
+        extracted_files.append(extract_resource(resource))
+
+    return extracted_files
 
 
 if __name__ == "__main__":

@@ -1,4 +1,6 @@
 import json
+from pathlib import Path
+from typing import Any
 
 import pandas as pd
 
@@ -11,7 +13,6 @@ logger = get_logger(__name__)
 
 def transform_users_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     result = df.copy()
-
     result = result[["id", "name", "username", "email"]]
 
     return result
@@ -19,21 +20,22 @@ def transform_users_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 
 def transform_posts_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     result = df.copy()
-
     result = result[["id", "userId", "title", "body"]]
     result = result.rename(columns={"userId": "user_id"})
 
     return result
 
 
-def read_json_file(file_path):
+def read_json_file(file_path: Path) -> list[dict[str, Any]]:
     validate_file_exists(file_path)
 
-    with open(file_path, encoding="utf-8") as file:
-        return json.load(file)
+    with file_path.open(encoding="utf-8") as file:
+        data = json.load(file)
+
+    return data
 
 
-def transform_api_data():
+def transform_api_data() -> list[Path]:
     users_raw = RAW_DIR / "users.json"
     posts_raw = RAW_DIR / "posts.json"
 
@@ -46,13 +48,15 @@ def transform_api_data():
     users_df = transform_users_dataframe(users_df)
     posts_df = transform_posts_dataframe(posts_df)
 
-    users_processed.parent.mkdir(parents=True, exist_ok=True)
+    PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 
     users_df.to_csv(users_processed, index=False)
     posts_df.to_csv(posts_processed, index=False)
 
     logger.info("Saved users to %s", users_processed)
     logger.info("Saved posts to %s", posts_processed)
+
+    return [users_processed, posts_processed]
 
 
 if __name__ == "__main__":

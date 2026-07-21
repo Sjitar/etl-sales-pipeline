@@ -15,7 +15,7 @@ def get_scalar(connection, query: str) -> int:
     return int(result[0])
 
 
-def validate_postgres_data() -> None:
+def validate_postgres_data() -> dict[str, int]:
     with get_postgres_connection() as connection:
         users_count = get_scalar(
             connection,
@@ -77,10 +77,20 @@ def validate_postgres_data() -> None:
     if posts_with_nulls > 0:
         raise ValueError(f"Found {posts_with_nulls} posts with null required fields")
 
+    result = {
+        "users_count": users_count,
+        "posts_count": posts_count,
+        "orphaned_posts_count": orphaned_posts_count,
+        "users_with_nulls": users_with_nulls,
+        "posts_with_nulls": posts_with_nulls,
+    }
+
     logger.info("Users count: %s", users_count)
     logger.info("Posts count: %s", posts_count)
     logger.info("Orphaned posts: %s", orphaned_posts_count)
     logger.info("PostgreSQL data quality checks passed")
+
+    return result
 
 
 if __name__ == "__main__":

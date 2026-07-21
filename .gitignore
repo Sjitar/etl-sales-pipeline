@@ -50,3 +50,5 @@ dbt/**/dbt_packages/
 
 # Python caches
 .mypy_cache/
+
+airflow/config/simple_auth_manager_passwords.json

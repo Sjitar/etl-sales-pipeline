@@ -14,11 +14,10 @@ def create_tables(connection) -> None:
     with connection.cursor() as cursor:
         cursor.execute(query)
 
-    connection.commit()
     logger.info("PostgreSQL tables created or already exist")
 
 
-def load_users(connection) -> None:
+def load_users(connection) -> int:
     users_file = PROCESSED_DIR / "users.csv"
     users_df = pd.read_csv(users_file)
 
@@ -38,11 +37,11 @@ def load_users(connection) -> None:
     with connection.cursor() as cursor:
         cursor.executemany(query, records)
 
-    connection.commit()
     logger.info("Loaded %s users into PostgreSQL", len(records))
+    return len(records)
 
 
-def load_posts(connection) -> None:
+def load_posts(connection) -> int:
     posts_file = PROCESSED_DIR / "posts.csv"
     posts_df = pd.read_csv(posts_file)
 
@@ -62,15 +61,23 @@ def load_posts(connection) -> None:
     with connection.cursor() as cursor:
         cursor.executemany(query, records)
 
-    connection.commit()
     logger.info("Loaded %s posts into PostgreSQL", len(records))
+    return len(records)
 
 
-def load_api_data_to_postgres() -> None:
+def load_api_data_to_postgres() -> dict[str, int]:
     with get_postgres_connection() as connection:
         create_tables(connection)
-        load_users(connection)
-        load_posts(connection)
+
+        users_count = load_users(connection)
+        posts_count = load_posts(connection)
+
+        connection.commit()
+
+    return {
+        "users": users_count,
+        "posts": posts_count,
+    }
 
 
 if __name__ == "__main__":
